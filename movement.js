@@ -192,10 +192,11 @@ function start_game() {
     
             CTX.fillStyle = "gray";
             CTX.fillRect(50, 50, W - 100, H - 100);
-    
-    
+
+            CTX.beginPath();
             CTX.fillStyle = "blue";
-            CTX.fillRect((targetX - 10) + (W / 2), (targetY - 10) + (H / 2), 20, 20);
+            CTX.arc((targetX - 15) + (W / 2), (targetY - 15) + (H / 2), 15, 0, 2 * Math.PI);
+            CTX.fill();
     
             CTX.beginPath();
             CTX.fillStyle = "red";
