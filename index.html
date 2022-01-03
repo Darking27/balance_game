@@ -12,12 +12,25 @@
 		<title>Led Lamp Controller</title>
 
 		<!-- Stichwörter -->
-		<link id="css" rel="stylesheet" type="text/css" href="style.css">
+		<!-- <link id="css" rel="stylesheet" type="text/css" href="style.css"> -->
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 
 		<!-- async Seite weiterladen während Skript eingelesen wird!! -->
 		<script src="./movement.js" async></script>
 	</head>
+
+	<style>
+		#invalid_device_warning {
+			display: none;
+    		font-size: larger;
+    		color: red;
+		}
+
+		#game {
+    		background-color: white;
+		}
+	</style>
+
 	<body>
         <h1>Balance Game</h1>
 
@@ -25,10 +38,48 @@
 			hole if it is slow enought, otherwise it will jump over the hole. The levels will
 			become harder with each level. Good Luck!
 		</p>
-		<button onclick="start_game()">Click to start</button>
+		<label>Nickname: </label>
+		<input type="text" id="nickname" placeholder="Enter a Nickname" oninput="nickname_changed()">
+		<button onclick="start_game()" id="start_game" disabled>Click to start</button>
+
+		<p id="invalid_device_warning">The game is not compatible with this device. Please try again with a mobile device.</p>
 
         <div id="container">
             <canvas id="game" style="display: none;"></canvas>
         </div>
+
+		<table>
+			<caption>Scoreboard</caption>
+			<tr>
+				<th>Position</th>
+				<th>Name</th>
+				<th>Level</th>
+			</tr>
+			<tr>
+				<td>1. </td>
+				<td id="pos-1-name">-</td>
+				<td id="pos-1-level">-</td>
+			</tr>
+			<tr>
+				<td>2. </td>
+				<td id="pos-2-name">-</td>
+				<td id="pos-2-level">-</td>
+			</tr>
+			<tr>
+				<td>3. </td>
+				<td id="pos-3-name">-</td>
+				<td id="pos-3-level">-</td>
+			</tr>
+			<tr>
+				<td>4. </td>
+				<td id="pos-4-name">-</td>
+				<td id="pos-4-level">-</td>
+			</tr>
+			<tr>
+				<td>5. </td>
+				<td id="pos-5-name">-</td>
+				<td id="pos-5-level">-</td>
+			</tr>
+		</table>
 	</body>
 </html>

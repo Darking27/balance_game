@@ -1,0 +1,8 @@
+DONE: 1. Scoreboard
+2. More interaction
+    - Holes in plate
+    - Bombs
+DONE: 3. Blue hole not too close to the wall
+4. Ingame menu
+    - Pause/Resume (Countdown on resume)
+DONE: 5. Game can only be played on devices with gyro
