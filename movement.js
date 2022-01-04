@@ -1,6 +1,12 @@
 var tiltLR;
 var tiltFB;
+
+//intervals
 var interval = null;
+var too_fast_message_timeout = null;
+
+var print_too_fast_message = false;
+
 var compatible_device = true;
 var current_nickname = "";
 var scoreboard = {
@@ -117,7 +123,7 @@ if ('DeviceOrientationEvent' in window) {
 } else {
     game_not_supported();
 }
-window.setTimeout(check_compatipility, 100);
+window.setTimeout(check_compatipility, 500);
 nickname_changed();
 initialize_scoreboard();
   
@@ -152,6 +158,9 @@ function nickname_changed() {
 }
 
 function start_game() {
+    start_game.load_new_Level = load_new_Level;
+    start_game.exit_game = exit_game;
+
     current_nickname = document.getElementById("nickname").value;
 
     // enter fullscreen mode
@@ -169,8 +178,19 @@ function start_game() {
 
     window.setTimeout(load_new_Level, 500);
 
-    function load_new_Level() {
+
+    function exit_game() {
+        document.getElementById("menu_overlay").style.display = "none";
+        insert_into_scoreboard(current_nickname, level - 1);
+        update_scoreboard();
+        document.exitFullscreen();
+    }
+
+    function load_new_Level(run) {
         CVS.style.display = "block";
+        document.getElementById("menu_play_button").style.display = "block";
+        document.getElementById("menu_retry_button").style.display = "none";
+        document.getElementById("menu_overlay").style.display = "none";
 
         var W = CVS.width = screen.width;
         var H = CVS.height = screen.height;
@@ -187,7 +207,12 @@ function start_game() {
         var targetX = Math.random() * (2 * (maxX - 15)) - (maxX - 15);
         var targetY = Math.random() * (2 * (maxY - 15)) - (maxY - 15);
 
-        interval = window.setInterval(loop, 15);
+        if (run) {
+            interval = window.setInterval(loop, 15);
+        } else {
+            loop();
+            document.getElementById("menu_overlay").style.display = "block";
+        }
 
         function loop() {
             // calculation of movement
@@ -211,40 +236,67 @@ function start_game() {
             positionY = positionY + speedY;
     
             if ((Math.abs(positionX) > maxX || Math.abs(positionY) > maxY) && document.fullscreenElement) {
-                insert_into_scoreboard(current_nickname, level);
-                update_scoreboard();
-                document.exitFullscreen();
-                //alert("Lose");
+                insert_into_scoreboard(current_nickname, level - 1);
+                window.clearInterval(interval);
+                print_too_fast_message = false;
+                redraw();
+                document.getElementById("menu_play_button").style.display = "none";
+                document.getElementById("menu_retry_button").style.display = "block";
+                document.getElementById("menu_overlay").style.display = "block";
             }
-    
-            CTX.fillStyle = "white";
-            CTX.fillRect(0, 0, W, H);
-    
-            CTX.fillStyle = "gray";
-            CTX.fillRect(50, 50, W - 100, H - 100);
 
-            CTX.beginPath();
-            CTX.fillStyle = "blue";
-            CTX.arc(targetX + (W / 2), targetY + (H / 2), 15, 0, 2 * Math.PI);
-            CTX.fill();
-    
-            CTX.beginPath();
-            CTX.fillStyle = "red";
-            CTX.arc(positionX + (W / 2), positionY + (H / 2), 10, 0, 2 * Math.PI);
-            CTX.fill();
-    
-            CTX.fillStyle = "black";
-            CTX.font = "30px Arial";
-            CTX.fillText("Level: " + level, 20, 30);
+            function redraw() {
+                CTX.fillStyle = "white";
+                CTX.fillRect(0, 0, W, H);
+        
+                CTX.fillStyle = "gray";
+                CTX.fillRect(50, 50, W - 100, H - 100);
+
+                if (run) {
+                    CTX.beginPath();
+                    CTX.fillStyle = "blue";
+                    CTX.arc(targetX + (W / 2), targetY + (H / 2), 15, 0, 2 * Math.PI);
+                    CTX.fill();
+                }
+        
+                CTX.beginPath();
+                CTX.fillStyle = "red";
+                CTX.arc(positionX + (W / 2), positionY + (H / 2), 10, 0, 2 * Math.PI);
+                CTX.fill();
+        
+                CTX.fillStyle = "black";
+                CTX.font = "30px Arial";
+                CTX.fillText("Level: " + level, 20, 30);
+
+                if (print_too_fast_message) {
+                    CTX.fillStyle = "red";
+                        CTX.font = "30px Arial";
+                        CTX.fillText("Too fast!", 300, 30);
+                }
+            }
+
+            redraw();
     
             var diffX = Math.abs(targetX - positionX);
             var diffY = Math.abs(targetY - positionY);
     
             var distance = Math.sqrt((diffX * diffX) + (diffY * diffY));
-            if (distance < 5 && speedX < 0.5 && speedY < 0.5) {
-                window.clearInterval(interval);
-                level = level + 1;
-                load_new_Level();
+            if (distance < 10) {
+                if ((Math.abs(speedX) < 0.5) && (Math.abs(speedY < 0.5))) {
+                    window.clearInterval(interval);
+                    print_too_fast_message = false;
+                    redraw();
+                    level = level + 1;
+                    document.getElementById("menu_play_button").style.display = "block";
+                    document.getElementById("menu_retry_button").style.display = "none";
+                    document.getElementById("menu_overlay").style.display = "block";
+                } else {
+                    print_too_fast_message = true;
+                    window.clearTimeout(too_fast_message_timeout);
+                    too_fast_message_timeout = window.setTimeout(function() {
+                        print_too_fast_message = false;
+                    }, 1000);
+                }
             }
     
         }

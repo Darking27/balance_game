@@ -29,6 +29,19 @@
 		#game {
     		background-color: white;
 		}
+
+		#menu_overlay {
+			position: fixed;
+			display: none;
+			width: 100%;
+			height: 100%;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background-color: rgba(0, 0, 0, 0.5);
+			z-index: 2;
+		}
 	</style>
 
 	<body>
@@ -46,6 +59,11 @@
 
         <div id="container">
             <canvas id="game" style="display: none;"></canvas>
+			<div id="menu_overlay">
+				<button id="menu_play_button" onclick="start_game.load_new_Level(true)">Play</button>
+				<button id="menu_retry_button" style="display: none;" onclick="start_game()">Retry</button>
+				<button onclick="start_game.exit_game()">Exit</button>
+			</div>
         </div>
 
 		<table>
