@@ -1,8 +1,10 @@
 DONE: 1. Scoreboard
-2. More interaction
+DONE: 2. More interaction
     - Holes in plate
-    - Bombs
+    - make plate and void better visible
 DONE: 3. Blue hole not too close to the wall
-4. Ingame menu
+DONE: 4. Ingame menu
     - Pause/Resume (Countdown on resume)
+    - Countdown before start
 DONE: 5. Game can only be played on devices with gyro
+DONE: 6. Do not allow spaces in nickname

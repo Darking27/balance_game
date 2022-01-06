@@ -30,7 +30,7 @@
     		background-color: white;
 		}
 
-		#menu_overlay {
+		.overlay {
 			position: fixed;
 			display: none;
 			width: 100%;
@@ -39,8 +39,33 @@
 			left: 0;
 			right: 0;
 			bottom: 0;
-			background-color: rgba(0, 0, 0, 0.5);
 			z-index: 2;
+		}
+
+		#menu_overlay {
+			background-color: rgba(0, 0, 0, 0.5);
+			align-items: center;
+			justify-content: center;
+		}
+
+		#countdown_overlay {
+			background-color: rgba(0, 0, 0, 0.1);
+			align-items: center;
+			justify-content: center;
+		}
+
+		#countdown_counter {
+			color: white;
+			font-size: 8rem;
+		}
+
+		.menu_button {
+			font-size: 3rem;
+			margin: 1.5rem;
+			background-color: yellow;
+			border-radius: 0.5rem;
+			border-color: gray;
+			border-width: 3px;
 		}
 	</style>
 
@@ -53,16 +78,19 @@
 		</p>
 		<label>Nickname: </label>
 		<input type="text" id="nickname" placeholder="Enter a Nickname" oninput="nickname_changed()">
-		<button onclick="start_game()" id="start_game" disabled>Click to start</button>
+		<button onclick="initialize_game()" id="start_game" disabled>Click to start</button>
 
 		<p id="invalid_device_warning">The game is not compatible with this device. Please try again with a mobile device.</p>
 
         <div id="container">
             <canvas id="game" style="display: none;"></canvas>
-			<div id="menu_overlay">
-				<button id="menu_play_button" onclick="start_game.load_new_Level(true)">Play</button>
-				<button id="menu_retry_button" style="display: none;" onclick="start_game()">Retry</button>
-				<button onclick="start_game.exit_game()">Exit</button>
+			<div id="menu_overlay" class="overlay">
+				<button id="menu_play_button"  class="menu_button" onclick="initialize_game.run_with_countdown()">Play</button>
+				<button id="menu_retry_button" class="menu_button" style="display: none;" onclick="initialize_game()">Retry</button>
+				<button class="menu_button" onclick="initialize_game.exit_game()">Exit</button>
+			</div>
+			<div id="countdown_overlay" class="overlay">
+				<h1 id="countdown_counter">3</h1>
 			</div>
         </div>
 

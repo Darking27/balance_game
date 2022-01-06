@@ -43,9 +43,7 @@ function initialize_scoreboard() {
             scoreboard[parameters[1]][parameters[2]] = split[1];
         }
     }
-    
-
-    update_scoreboard();
+     update_scoreboard();
 }
 
 function update_scoreboard() {
@@ -140,26 +138,33 @@ document.getElementById('container').addEventListener('fullscreenchange', (event
     // is in fullscreen mode if there is one. If not, the value
     // of the property is null.
     if (document.fullscreenElement) {
-      console.log(`Element: ${document.fullscreenElement.id} entered fullscreen mode.`);
+        console.log(`Element: ${document.fullscreenElement.id} entered fullscreen mode.`);
     } else {
-      console.log('Leaving full-screen mode.');
-      CVS.style.display = "none";
-      clearInterval(interval);
+        console.log('Leaving full-screen mode.');
+        CVS.style.display = "none";
+        document.getElementById("menu_overlay").style.display = "none";
+        document.getElementById("countdown_overlay").style.display = "none";
+        clearInterval(interval);
     }
 });
 
 function nickname_changed() {
-    var nickname = document.getElementById("nickname");
-    if (nickname.value !== "" && compatible_device) {
+    var new_nickname = document.getElementById("nickname").value;
+    var whitepaceless = new_nickname.replace(/[ ]/g, '');
+    if (new_nickname !== whitepaceless) {
+        document.getElementById("nickname").value = whitepaceless;
+    }
+    if (whitepaceless !== "" && compatible_device) {
         document.getElementById("start_game").disabled = false;
     } else {
         document.getElementById("start_game").disabled = true;
     }
 }
 
-function start_game() {
-    start_game.load_new_Level = load_new_Level;
-    start_game.exit_game = exit_game;
+function initialize_game() {
+    initialize_game.load_new_Level = load_new_Level;
+    initialize_game.exit_game = exit_game;
+    initialize_game.run_with_countdown = run_with_countdown;
 
     current_nickname = document.getElementById("nickname").value;
 
@@ -176,6 +181,27 @@ function start_game() {
 
     var level = 1;
 
+    var W = 0;
+    var H = 0;
+
+    var maxX = 0;
+    var maxY = 0;
+
+    var positionX = 0;
+    var positionY = 0;
+
+    var speedX = 0;
+    var speedY = 0;
+
+    var targetX = 0;
+    var targetY = 0;
+
+    var holeX = [];
+    var holeY = [];
+
+    var background_image = new Image();
+    background_image.src = "wood.jpg";
+
     window.setTimeout(load_new_Level, 500);
 
 
@@ -186,76 +212,155 @@ function start_game() {
         document.exitFullscreen();
     }
 
+    function run_with_countdown() {
+        document.getElementById("menu_overlay").style.display = "none";
+
+        function countdown(number) {
+            document.getElementById("countdown_counter").innerText = String(number);
+        }
+
+        document.getElementById("countdown_overlay").style.display = "flex";
+
+        countdown(3);
+        window.setTimeout(countdown, 1000, 2);
+        window.setTimeout(countdown, 2000, 1);
+        window.setTimeout(load_new_Level, 3000, true);
+    }
+
     function load_new_Level(run) {
         CVS.style.display = "block";
         document.getElementById("menu_play_button").style.display = "block";
         document.getElementById("menu_retry_button").style.display = "none";
         document.getElementById("menu_overlay").style.display = "none";
+        document.getElementById("countdown_overlay").style.display = "none";
 
-        var W = CVS.width = screen.width;
-        var H = CVS.height = screen.height;
-
-        var maxX = (W - 100) / 2;
-        var maxY = (H - 100) / 2;
-
-        var positionX = 0;
-        var positionY = 0;
-
-        var speedX = 0;
-        var speedY = 0;
-
-        var targetX = Math.random() * (2 * (maxX - 15)) - (maxX - 15);
-        var targetY = Math.random() * (2 * (maxY - 15)) - (maxY - 15);
+        const HOLE_RADIUS = 40;
 
         if (run) {
+            // run game
             interval = window.setInterval(loop, 15);
+            console.log("Set interval for loop");
         } else {
+            // initialize game variables
+            W = CVS.width = screen.width;
+            H = CVS.height = screen.height;
+
+            maxX = (W - 100) / 2;
+            maxY = (H - 100) / 2;
+
+            positionX = Math.random() * (2 * (maxX - 25)) - (maxX - 25);
+            positionY = Math.random() * (2 * (maxY - 25)) - (maxY - 25);
+
+            speedX = 0;
+            speedY = 0;
+
+            if (level % 5 === 0 && level <= 50) {
+                holeX.push(0);
+                holeY.push(0);
+            }
+
+            for (var i = 0; i < holeX.length; i++) {
+                var hole_ok = false;
+                while (!hole_ok) {
+                    holeX[i] = Math.random() * (2 * (maxX - HOLE_RADIUS - 5)) - (maxX - HOLE_RADIUS - 5);
+                    holeY[i] = Math.random() * (2 * (maxY - HOLE_RADIUS - 5)) - (maxY - HOLE_RADIUS - 5);
+                    if (Math.dist(holeX[i], positionX, holeY[i], positionY) < HOLE_RADIUS + 5) continue;
+                    var hit_prev_holes = false;
+                    for (var a = 0; a < i; a++) {
+                        if (Math.dist(holeX[i], holeX[a], holeY[i], holeY[a]) < (2 * HOLE_RADIUS + 20)) hit_prev_holes = true;
+                    }
+                    hole_ok = !hit_prev_holes;
+                }
+            }
+
+            targetX = 0;
+            targetY = 0;
+
+            // ensure target is not to close to holes or red ball
+            var target_ok = false;
+            while (!target_ok) {
+                targetX = Math.random() * (2 * (maxX - 20)) - (maxX - 20);
+                targetY = Math.random() * (2 * (maxY - 20)) - (maxY - 20);
+                if (Math.dist(targetX, positionX, targetY, positionY) < (maxX - 30)) continue;
+                var holes_ok = true;
+                for (var i = 0; i < holeX.length; i++) {
+                    if (Math.dist(holeX[i], targetX, holeY[i], targetY) < HOLE_RADIUS + 20) holes_ok = false;
+                }
+                target_ok = holes_ok;
+            }
             loop();
-            document.getElementById("menu_overlay").style.display = "block";
+            document.getElementById("menu_overlay").style.display = "flex";
         }
 
         function loop() {
             // calculation of movement
-            var factor = 0.01 + (0.001 * level);
-    
-            speedX = speedX + (tiltFB * factor);
-            speedY = speedY - (tiltLR * factor);
-    
-            if (speedX > 3) {
-                speedX = 3;
-            } else if (speedX < -3) {
-                speedX = -3;
+            if (run) {
+                if (level < 5) {
+                    factor = 0.002 + (0.002 * (level - 1));
+                } else if (level < 20) {
+                    factor = 0.01 + (0.001 * (level - 5));
+                } else {
+                    factor = 0.025 + (0.0002 * (level - 20));
+                }
+        
+                speedX = speedX + (tiltFB * factor);
+                speedY = speedY - (tiltLR * factor);
+        
+                if (speedX > 3) {
+                    speedX = 3;
+                } else if (speedX < -3) {
+                    speedX = -3;
+                }
+                if (speedY > 3) {
+                    speedY = 3;
+                } else if (speedY < -3) {
+                    speedY = -3;
+                }
+        
+                positionX = positionX + speedX;
+                positionY = positionY + speedY;
             }
-            if (speedY > 3) {
-                speedY = 3;
-            } else if (speedY < -3) {
-                speedY = -3;
-            }
     
-            positionX = positionX + speedX;
-            positionY = positionY + speedY;
-    
+            // check if red ball is over void
+            var ball_out = false;
             if ((Math.abs(positionX) > maxX || Math.abs(positionY) > maxY) && document.fullscreenElement) {
+                ball_out = true;
+                console.log("outside void");
+            }
+            for (var i = 0; i < holeX.length; i++) {
+                if (Math.dist(holeX[i], positionX, holeY[i], positionY) < HOLE_RADIUS) {
+                    ball_out = true;
+                    console.log("hole void");
+                }
+            }
+            if (ball_out) {
                 insert_into_scoreboard(current_nickname, level - 1);
                 window.clearInterval(interval);
                 print_too_fast_message = false;
                 redraw();
                 document.getElementById("menu_play_button").style.display = "none";
                 document.getElementById("menu_retry_button").style.display = "block";
-                document.getElementById("menu_overlay").style.display = "block";
+                document.getElementById("menu_overlay").style.display = "flex";
             }
 
             function redraw() {
-                CTX.fillStyle = "white";
+                CTX.fillStyle = "black";
                 CTX.fillRect(0, 0, W, H);
         
-                CTX.fillStyle = "gray";
+                var pattern = CTX.createPattern(background_image, "repeat");
+                CTX.fillStyle = pattern;
                 CTX.fillRect(50, 50, W - 100, H - 100);
 
-                if (run) {
+                CTX.beginPath();
+                CTX.fillStyle = "blue";
+                CTX.arc(targetX + (W / 2), targetY + (H / 2), 15, 0, 2 * Math.PI);
+                CTX.fill();
+
+                // holes
+                for (var i = 0; i < holeX.length; i++) {
                     CTX.beginPath();
-                    CTX.fillStyle = "blue";
-                    CTX.arc(targetX + (W / 2), targetY + (H / 2), 15, 0, 2 * Math.PI);
+                    CTX.fillStyle = "black";
+                    CTX.arc(holeX[i] + (W / 2), holeY[i] + (H / 2), HOLE_RADIUS, 0, 2 * Math.PI);
                     CTX.fill();
                 }
         
@@ -264,7 +369,7 @@ function start_game() {
                 CTX.arc(positionX + (W / 2), positionY + (H / 2), 10, 0, 2 * Math.PI);
                 CTX.fill();
         
-                CTX.fillStyle = "black";
+                CTX.fillStyle = "white";
                 CTX.font = "30px Arial";
                 CTX.fillText("Level: " + level, 20, 30);
 
@@ -285,11 +390,11 @@ function start_game() {
                 if ((Math.abs(speedX) < 0.5) && (Math.abs(speedY < 0.5))) {
                     window.clearInterval(interval);
                     print_too_fast_message = false;
-                    redraw();
                     level = level + 1;
+                    load_new_Level(false);
                     document.getElementById("menu_play_button").style.display = "block";
                     document.getElementById("menu_retry_button").style.display = "none";
-                    document.getElementById("menu_overlay").style.display = "block";
+                    document.getElementById("menu_overlay").style.display = "flex";
                 } else {
                     print_too_fast_message = true;
                     window.clearTimeout(too_fast_message_timeout);
@@ -302,4 +407,12 @@ function start_game() {
         }
     }
 
+}
+
+// helpers
+
+Math.dist = function(x1, x2, y1, y2) {
+    if(!x2) x2=0; 
+    if(!y2) y2=0;
+    return Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
 }
