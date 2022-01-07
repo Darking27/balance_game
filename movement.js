@@ -114,7 +114,6 @@ function game_not_supported() {
 
 function check_compatipility() {
     if (isNaN(tiltFB) || isNaN(tiltLR)) {
-        document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + "\n orientation value is NaN";
         game_not_supported();
     }
     nickname_changed();
@@ -149,11 +148,8 @@ document.getElementById('container').addEventListener('fullscreenchange', (event
 function nickname_changed() {
     var new_nickname = document.getElementById("nickname").value;
     if (new_nickname !== "") {
-        document.getElementById("invalid_device_warning").style.display = "block";
         if (!checked_compatibility) {
-            document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + "check compatibility";
             if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-                document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + "\n request permission";
                 DeviceOrientationEvent.requestPermission()
                     .then(response => {
                         if (response === "granted") {
@@ -161,17 +157,14 @@ function nickname_changed() {
                             compatible_device = true;
                             // document.getElementById("invalid_device_warning").style.display = "none";
                             window.setTimeout(check_compatipility, 500);
-                            document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + "\n permission granted";
                         }
                     })
                     .catch(function() {
-                        document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + "\n exception during permission request";
                         game_not_supported();
                     });
             } else {
                 window.addEventListener('deviceorientation', deviceOrientationHandler, false);
                  compatible_device = true;
-                 document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + "\n device orientation handler is in window";
             }
             window.setTimeout(check_compatipility, 500);
             checked_compatibility = true;
@@ -195,16 +188,21 @@ function initialize_game() {
 
     current_nickname = document.getElementById("nickname").value;
 
-    // enter fullscreen mode
-    var game_display = document.querySelector("#container");
-    if(game_display.requestFullscreen) {
-        game_display.requestFullscreen();
-    } else if(game_display.webkitRequestFullScreen) {
-        game_display.webkitRequestFullScreen();
-    }
+    try {
+        // enter fullscreen mode
+        var game_display = document.querySelector("#container");
+        if(game_display.requestFullscreen) {
+            game_display.requestFullscreen();
+        } else if(game_display.webkitRequestFullScreen) {
+            game_display.webkitRequestFullScreen();
+        }
 
-    // set lanscape mode
-    screen.orientation.lock("landscape-primary");
+        // set lanscape mode
+        screen.orientation.lock("landscape-primary");
+    } catch (e) {
+        document.getElementById("invalid_device_warning").style.display = "block";
+        document.getElementById("invalid_device_warning").innerText = "Error when entering fullscreen: " + String(e.message);
+    }
 
     var level = 1;
 
