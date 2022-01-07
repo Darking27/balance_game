@@ -156,6 +156,9 @@ function nickname_changed() {
                     .then(response => {
                         if (response === "granted") {
                             window.addEventListener('deviceorientation', deviceOrientationHandler, false);
+                            compatible_device = true;
+                            document.getElementById("invalid_device_warning").style.display = "block";
+                            window.setTimeout(check_compatipility, 500);
                             document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + " (permission granted) ";
                         }
                     })
