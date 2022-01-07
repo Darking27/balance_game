@@ -114,7 +114,7 @@ function game_not_supported() {
 
 function check_compatipility() {
     if (isNaN(tiltFB) || isNaN(tiltLR)) {
-        document.getElementById("invalid_device_warning").innerText = "orientation value is NaN"
+        document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + " (orientation value is NaN) ";
         game_not_supported();
     }
     nickname_changed();
@@ -153,19 +153,19 @@ function nickname_changed() {
             if ('DeviceOrientationEvent' in window) {
                 window.addEventListener('deviceorientation', deviceOrientationHandler, false);
                 compatible_device = true;
-                document.getElementById("invalid_device_warning").innerText += " (device orientation handler is in window) "
+                document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + " (device orientation handler is in window) ";
             } else {
-                document.getElementById("invalid_device_warning").innerText += " (requested permission) "
+                document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + " (requested permission) ";
                 window.DeviceOrientationEvent.requestPermission()
                     .then(response => {
                         if (response === "granted") {
                             window.addEventListener('deviceorientation', deviceOrientationHandler, false);
                             compatible_device = true;
-                            document.getElementById("invalid_device_warning").innerText += " (permission granted) "
+                            document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + " (permission granted) ";
                         }
                     })
                     .catch(function() {
-                        document.getElementById("invalid_device_warning").innerText += " (exeption during permission check) "
+                        document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + " (exeption during permission check) ";
                         game_not_supported();
                     });
             }
