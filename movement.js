@@ -114,8 +114,8 @@ function game_not_supported() {
 
 function check_compatipility() {
     if (isNaN(tiltFB) || isNaN(tiltLR)) {
+        document.getElementById("invalid_device_warning").innerText = "orientation value is NaN"
         game_not_supported();
-        alert("Exception during permission request");
     }
     nickname_changed();
 }
@@ -154,7 +154,7 @@ function nickname_changed() {
                 window.addEventListener('deviceorientation', deviceOrientationHandler, false);
                 compatible_device = true;
             } else {
-                DeviceOrientationEvent.requestPermission()
+                window.DeviceOrientationEvent.requestPermission()
                     .then(response => {
                         if (response === "granted") {
                             window.addEventListener('deviceorientation', deviceOrientationHandler, false);
@@ -162,7 +162,7 @@ function nickname_changed() {
                         }
                     })
                     .catch(function() {
-                        alert("Exception during permission request");
+                        document.getElementById("invalid_device_warning").innerText = "exeption during permission check"
                         game_not_supported();
                     });
             }
