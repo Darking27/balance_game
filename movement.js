@@ -196,15 +196,15 @@ function initialize_game() {
     current_nickname = document.getElementById("nickname").value;
 
     // enter fullscreen mode
-    // var game_display = document.querySelector("#container");
-    // if(game_display.requestFullscreen) {
-    //     game_display.requestFullscreen();
-    // } else if(game_display.webkitRequestFullScreen) {
-    //     game_display.webkitRequestFullScreen();
-    // }
+    var game_display = document.querySelector("#container");
+    if(game_display.requestFullscreen) {
+        game_display.requestFullscreen();
+    } else if(game_display.webkitRequestFullScreen) {
+        game_display.webkitRequestFullScreen();
+    }
 
     // set lanscape mode
-    // screen.orientation.lock("landscape-primary");
+    screen.orientation.lock("landscape-primary");
 
     var level = 1;
 
