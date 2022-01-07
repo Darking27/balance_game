@@ -115,6 +115,7 @@ function game_not_supported() {
 function check_compatipility() {
     if (isNaN(tiltFB) || isNaN(tiltLR)) {
         game_not_supported();
+        alert("Exception during permission request");
     }
     nickname_changed();
 }
@@ -160,7 +161,10 @@ function nickname_changed() {
                             compatible_device = true;
                         }
                     })
-                    .catch(game_not_supported());
+                    .catch(function() {
+                        alert("Exception during permission request");
+                        game_not_supported();
+                    });
             }
             window.setTimeout(check_compatipility, 500);
             checked_compatibility = true;
