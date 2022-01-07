@@ -201,7 +201,11 @@ function initialize_game() {
         screen.orientation.lock("landscape-primary");
     } catch (e) {
         document.getElementById("invalid_device_warning").style.display = "block";
-        document.getElementById("invalid_device_warning").innerText = "Error when entering fullscreen: " + String(e.message);
+        document.getElementById("invalid_device_warning").innerText = "Device not compatible (probably because of apple)\nError message: " + String(e.message);
+        CVS.style.display = "none";
+        document.getElementById("menu_overlay").style.display = "none";
+        document.getElementById("countdown_overlay").style.display = "none";
+        clearInterval(interval);
     }
 
     var level = 1;
