@@ -150,17 +150,12 @@ function nickname_changed() {
     var new_nickname = document.getElementById("nickname").value;
     if (new_nickname !== "") {
         if (!checked_compatibility) {
-            // if ('DeviceOrientationEvent' in window) {
-            //     window.addEventListener('deviceorientation', deviceOrientationHandler, false);
-            //     compatible_device = true;
-            //     document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + " (device orientation handler is in window) ";
-            // } else {
+            if (typeof DeviceOrientationEvent.requestPermission === 'function') {
                 document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + " (requested permission) ";
-                window.DeviceOrientationEvent.requestPermission()
+                DeviceOrientationEvent.requestPermission()
                     .then(response => {
                         if (response === "granted") {
                             window.addEventListener('deviceorientation', deviceOrientationHandler, false);
-                            compatible_device = true;
                             document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + " (permission granted) ";
                         }
                     })
@@ -168,9 +163,32 @@ function nickname_changed() {
                         document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + " (exeption during permission check) ";
                         game_not_supported();
                     });
+            } else {
+                window.addEventListener('deviceorientation', deviceOrientationHandler, false);
+                 compatible_device = true;
+                 document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + " (device orientation handler is in window) ";
+            }
+            // if ('DeviceOrientationEvent' in window) {
+            //     window.addEventListener('deviceorientation', deviceOrientationHandler, false);
+            //     compatible_device = true;
+            //     document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + " (device orientation handler is in window) ";
+            // } else {
+                // document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + " (requested permission) ";
+                // DeviceOrientationEvent.requestPermission()
+                //     .then(response => {
+                //         if (response === "granted") {
+                //             window.addEventListener('deviceorientation', deviceOrientationHandler, false);
+                //             compatible_device = true;
+                //             document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + " (permission granted) ";
+                //         }
+                //     })
+                //     .catch(function() {
+                //         document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + " (exeption during permission check) ";
+                //         game_not_supported();
+                //     });
             // }
             window.setTimeout(check_compatipility, 500);
-            // checked_compatibility = true;
+            checked_compatibility = true;
         }
     }
     var whitepaceless = new_nickname.replace(/[ ]/g, '');
