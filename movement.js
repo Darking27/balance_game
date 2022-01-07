@@ -7,7 +7,9 @@ var too_fast_message_timeout = null;
 
 var print_too_fast_message = false;
 
-var compatible_device = true;
+var compatible_device = false;
+var checked_compatibility = false
+
 var current_nickname = "";
 var scoreboard = {
     1: {
@@ -114,19 +116,9 @@ function check_compatipility() {
     if (isNaN(tiltFB) || isNaN(tiltLR)) {
         game_not_supported();
     }
+    nickname_changed();
 }
 
-if ('DeviceOrientationEvent' in window) {
-    window.addEventListener('deviceorientation', deviceOrientationHandler, false);
-} else {
-    DeviceOrientationEvent.requestPermission()
-        .then(response => {
-            if (response === "granted") {
-                window.addEventListener('deviceorientation', deviceOrientationHandler, false);
-            }
-        })
-}
-window.setTimeout(check_compatipility, 500);
 nickname_changed();
 initialize_scoreboard();
   
@@ -155,6 +147,25 @@ document.getElementById('container').addEventListener('fullscreenchange', (event
 
 function nickname_changed() {
     var new_nickname = document.getElementById("nickname").value;
+    if (new_nickname !== "") {
+        if (!checked_compatibility) {
+            if ('DeviceOrientationEvent' in window) {
+                window.addEventListener('deviceorientation', deviceOrientationHandler, false);
+                compatible_device = true;
+            } else {
+                DeviceOrientationEvent.requestPermission()
+                    .then(response => {
+                        if (response === "granted") {
+                            window.addEventListener('deviceorientation', deviceOrientationHandler, false);
+                            compatible_device = true;
+                        }
+                    })
+                    .catch(game_not_supported());
+            }
+            window.setTimeout(check_compatipility, 500);
+            checked_compatibility = true;
+        }
+    }
     var whitepaceless = new_nickname.replace(/[ ]/g, '');
     if (new_nickname !== whitepaceless) {
         document.getElementById("nickname").value = whitepaceless;
@@ -207,7 +218,7 @@ function initialize_game() {
     var background_image = new Image();
     background_image.src = "wood.jpg";
 
-    window.setTimeout(load_new_Level, 500);
+    window.setTimeout(load_new_Level, 1000);
 
 
     function exit_game() {
@@ -259,7 +270,11 @@ function initialize_game() {
             speedX = 0;
             speedY = 0;
 
-            if (level % 5 === 0 && level <= 50) {
+            if (level % 3 === 0 && level <= 21) {
+                holeX.push(0);
+                holeY.push(0);
+            }
+            if (level % 5 === 0 && level > 21) {
                 holeX.push(0);
                 holeY.push(0);
             }
@@ -300,8 +315,8 @@ function initialize_game() {
         function loop() {
             // calculation of movement
             if (run) {
-                if (level < 5) {
-                    factor = 0.002 + (0.002 * (level - 1));
+                if (level < 8) {
+                    factor = 0.004 + (0.002 * (level - 1));
                 } else if (level < 20) {
                     factor = 0.01 + (0.001 * (level - 5));
                 } else {
