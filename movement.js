@@ -155,7 +155,7 @@ function nickname_changed() {
                         if (response === "granted") {
                             window.addEventListener('deviceorientation', deviceOrientationHandler, false);
                             compatible_device = true;
-                            // document.getElementById("invalid_device_warning").style.display = "none";
+                            document.getElementById("invalid_device_warning").style.display = "none";
                             window.setTimeout(check_compatipility, 500);
                         }
                     })
@@ -206,6 +206,7 @@ function initialize_game() {
         document.getElementById("menu_overlay").style.display = "none";
         document.getElementById("countdown_overlay").style.display = "none";
         clearInterval(interval);
+        return;
     }
 
     var level = 1;
