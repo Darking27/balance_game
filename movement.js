@@ -150,8 +150,8 @@ function nickname_changed() {
     var new_nickname = document.getElementById("nickname").value;
     if (new_nickname !== "") {
         document.getElementById("invalid_device_warning").style.display = "block";
-        document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + "check compatibility";
         if (!checked_compatibility) {
+            document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + "check compatibility";
             if (typeof DeviceOrientationEvent.requestPermission === 'function') {
                 document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + "\n request permission";
                 DeviceOrientationEvent.requestPermission()
@@ -196,15 +196,15 @@ function initialize_game() {
     current_nickname = document.getElementById("nickname").value;
 
     // enter fullscreen mode
-    var game_display = document.querySelector("#container");
-    if(game_display.requestFullscreen) {
-        game_display.requestFullscreen();
-    } else if(game_display.webkitRequestFullScreen) {
-        game_display.webkitRequestFullScreen();
-    }
+    // var game_display = document.querySelector("#container");
+    // if(game_display.requestFullscreen) {
+    //     game_display.requestFullscreen();
+    // } else if(game_display.webkitRequestFullScreen) {
+    //     game_display.webkitRequestFullScreen();
+    // }
 
     // set lanscape mode
-    screen.orientation.lock("landscape-primary");
+    // screen.orientation.lock("landscape-primary");
 
     var level = 1;
 
