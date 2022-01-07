@@ -150,11 +150,11 @@ function nickname_changed() {
     var new_nickname = document.getElementById("nickname").value;
     if (new_nickname !== "") {
         if (!checked_compatibility) {
-            if ('DeviceOrientationEvent' in window) {
-                window.addEventListener('deviceorientation', deviceOrientationHandler, false);
-                compatible_device = true;
-                document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + " (device orientation handler is in window) ";
-            } else {
+            // if ('DeviceOrientationEvent' in window) {
+            //     window.addEventListener('deviceorientation', deviceOrientationHandler, false);
+            //     compatible_device = true;
+            //     document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + " (device orientation handler is in window) ";
+            // } else {
                 document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + " (requested permission) ";
                 window.DeviceOrientationEvent.requestPermission()
                     .then(response => {
@@ -168,9 +168,9 @@ function nickname_changed() {
                         document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + " (exeption during permission check) ";
                         game_not_supported();
                     });
-            }
+            // }
             window.setTimeout(check_compatipility, 500);
-            checked_compatibility = true;
+            // checked_compatibility = true;
         }
     }
     var whitepaceless = new_nickname.replace(/[ ]/g, '');
