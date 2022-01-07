@@ -119,7 +119,12 @@ function check_compatipility() {
 if ('DeviceOrientationEvent' in window) {
     window.addEventListener('deviceorientation', deviceOrientationHandler, false);
 } else {
-    game_not_supported();
+    DeviceOrientationEvent.requestPermission()
+        .then(response => {
+            if (response === "granted") {
+                window.addEventListener('deviceorientation', deviceOrientationHandler, false);
+            }
+        })
 }
 window.setTimeout(check_compatipility, 500);
 nickname_changed();
