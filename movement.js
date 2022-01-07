@@ -114,7 +114,7 @@ function game_not_supported() {
 
 function check_compatipility() {
     if (isNaN(tiltFB) || isNaN(tiltLR)) {
-        document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + " (orientation value is NaN) ";
+        document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + "\n orientation value is NaN";
         game_not_supported();
     }
     nickname_changed();
@@ -149,47 +149,30 @@ document.getElementById('container').addEventListener('fullscreenchange', (event
 function nickname_changed() {
     var new_nickname = document.getElementById("nickname").value;
     if (new_nickname !== "") {
+        document.getElementById("invalid_device_warning").style.display = "block";
+        document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + "check compatibility";
         if (!checked_compatibility) {
             if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-                document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + " (requested permission) ";
+                document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + "\n request permission";
                 DeviceOrientationEvent.requestPermission()
                     .then(response => {
                         if (response === "granted") {
                             window.addEventListener('deviceorientation', deviceOrientationHandler, false);
                             compatible_device = true;
-                            document.getElementById("invalid_device_warning").style.display = "block";
+                            // document.getElementById("invalid_device_warning").style.display = "none";
                             window.setTimeout(check_compatipility, 500);
-                            document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + " (permission granted) ";
+                            document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + "\n permission granted";
                         }
                     })
                     .catch(function() {
-                        document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + " (exeption during permission check) ";
+                        document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + "\n exception during permission request";
                         game_not_supported();
                     });
             } else {
                 window.addEventListener('deviceorientation', deviceOrientationHandler, false);
                  compatible_device = true;
-                 document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + " (device orientation handler is in window) ";
+                 document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + "\n device orientation handler is in window";
             }
-            // if ('DeviceOrientationEvent' in window) {
-            //     window.addEventListener('deviceorientation', deviceOrientationHandler, false);
-            //     compatible_device = true;
-            //     document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + " (device orientation handler is in window) ";
-            // } else {
-                // document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + " (requested permission) ";
-                // DeviceOrientationEvent.requestPermission()
-                //     .then(response => {
-                //         if (response === "granted") {
-                //             window.addEventListener('deviceorientation', deviceOrientationHandler, false);
-                //             compatible_device = true;
-                //             document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + " (permission granted) ";
-                //         }
-                //     })
-                //     .catch(function() {
-                //         document.getElementById("invalid_device_warning").innerText = document.getElementById("invalid_device_warning").innerText + " (exeption during permission check) ";
-                //         game_not_supported();
-                //     });
-            // }
             window.setTimeout(check_compatipility, 500);
             checked_compatibility = true;
         }
